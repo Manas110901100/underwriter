@@ -1,0 +1,172 @@
+{
+  "kind": "architecture",
+  "title": "Commercial Auto Submission Review",
+  "subtitle": "Architecture: modules and who calls whom (runs locally, one packet per review)",
+  "layers": [
+    {
+      "label": "User",
+      "nodes": [
+        {
+          "id": "uw",
+          "label": "Underwriter",
+          "kind": "ui"
+        }
+      ]
+    },
+    {
+      "label": "Entry points",
+      "nodes": [
+        {
+          "id": "cli",
+          "label": "main.py\nCLI",
+          "kind": "ui"
+        },
+        {
+          "id": "app",
+          "label": "app.py\nStreamlit UI",
+          "kind": "ui"
+        }
+      ]
+    },
+    {
+      "label": "Orchestration & review",
+      "nodes": [
+        {
+          "id": "review",
+          "label": "review/ merge + rules\nnormalize, R1-R5",
+          "kind": "service"
+        },
+        {
+          "id": "pipe",
+          "label": "pipeline.py\nasyncio.gather",
+          "kind": "gateway"
+        },
+        {
+          "id": "narr",
+          "label": "narrative.py\nsummary + draft email",
+          "kind": "service"
+        }
+      ]
+    },
+    {
+      "label": "Extraction (one reader per file)",
+      "nodes": [
+        {
+          "id": "csv",
+          "label": "csv_reader.py\nrow count, no LLM",
+          "kind": "worker"
+        },
+        {
+          "id": "pdf",
+          "label": "pdf_reader.py\npdfplumber",
+          "kind": "worker"
+        },
+        {
+          "id": "email",
+          "label": "email_reader.py\n.txt / pasted",
+          "kind": "worker"
+        },
+        {
+          "id": "llm",
+          "label": "llm.py\nLangChain ChatOpenAI",
+          "kind": "ai"
+        }
+      ]
+    },
+    {
+      "label": "Inputs & external",
+      "nodes": [
+        {
+          "id": "files",
+          "label": "Submission files\nPDF / TXT / CSV",
+          "kind": "datastore"
+        },
+        {
+          "id": "openai",
+          "label": "OpenAI API\ngpt-4o-mini",
+          "kind": "external"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "uw",
+      "to": "app",
+      "label": "browser :8501"
+    },
+    {
+      "from": "uw",
+      "to": "cli",
+      "label": "terminal"
+    },
+    {
+      "from": "app",
+      "to": "pipe",
+      "label": "extract_all"
+    },
+    {
+      "from": "cli",
+      "to": "pipe",
+      "label": "extract_all"
+    },
+    {
+      "from": "app",
+      "to": "review",
+      "label": "merge, override, rules"
+    },
+    {
+      "from": "cli",
+      "to": "review"
+    },
+    {
+      "from": "app",
+      "to": "narr",
+      "label": "write_narrative"
+    },
+    {
+      "from": "pipe",
+      "to": "pdf"
+    },
+    {
+      "from": "pipe",
+      "to": "email"
+    },
+    {
+      "from": "pipe",
+      "to": "csv"
+    },
+    {
+      "from": "narr",
+      "to": "llm",
+      "label": "facts only"
+    },
+    {
+      "from": "pdf",
+      "to": "files",
+      "label": "read"
+    },
+    {
+      "from": "email",
+      "to": "files"
+    },
+    {
+      "from": "csv",
+      "to": "files"
+    },
+    {
+      "from": "pdf",
+      "to": "llm"
+    },
+    {
+      "from": "email",
+      "to": "llm"
+    },
+    {
+      "from": "llm",
+      "to": "openai",
+      "label": "strict JSON schema"
+    }
+  ],
+  "auto_order": false
+}

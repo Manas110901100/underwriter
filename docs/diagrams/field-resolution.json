@@ -1,0 +1,42 @@
+{
+  "kind": "flow",
+  "title": "How one field gets its state",
+  "subtitle": "review/merge.py merge_field(): application PDF + broker email",
+  "nodes": [
+    {"id": "s", "label": "Field from each\napplication / email", "type": "start"},
+    {"id": "err", "label": "Source read\nwithout error?", "type": "decision"},
+    {"id": "failed", "label": "Add to\n'could not be checked'", "type": "process"},
+    {"id": "status", "label": "Model status?", "type": "decision"},
+    {"id": "skip", "label": "Ignore source\n(silence)", "type": "process"},
+    {"id": "norm", "label": "normalize()\nvalue", "type": "process"},
+    {"id": "cand", "label": "Collect candidates\n+ evidence", "type": "io"},
+    {"id": "dis", "label": "Sources disagree\nor 'conflicting'?", "type": "decision"},
+    {"id": "inv", "label": "Any INVALID?", "type": "decision"},
+    {"id": "kn", "label": "Any KNOWN?", "type": "decision"},
+    {"id": "fl", "label": "Any source\nfailed?", "type": "decision"},
+    {"id": "C", "label": "CONFLICT\nvalue null, both kept", "type": "error"},
+    {"id": "I", "label": "INVALID", "type": "error"},
+    {"id": "K", "label": "KNOWN", "type": "end"},
+    {"id": "M", "label": "MISSING", "type": "end"}
+  ],
+  "edges": [
+    {"from": "s", "to": "err"},
+    {"from": "err", "to": "failed", "label": "no"},
+    {"from": "err", "to": "status", "label": "yes"},
+    {"from": "status", "to": "skip", "label": "not_mentioned"},
+    {"from": "status", "to": "norm", "label": "stated"},
+    {"from": "status", "to": "cand", "label": "other"},
+    {"from": "norm", "to": "cand"},
+    {"from": "failed", "to": "cand"},
+    {"from": "skip", "to": "cand"},
+    {"from": "cand", "to": "dis"},
+    {"from": "dis", "to": "C", "label": "yes"},
+    {"from": "dis", "to": "inv", "label": "no"},
+    {"from": "inv", "to": "I", "label": "yes"},
+    {"from": "inv", "to": "kn", "label": "no"},
+    {"from": "kn", "to": "K", "label": "yes"},
+    {"from": "kn", "to": "fl", "label": "no"},
+    {"from": "fl", "to": "I", "label": "yes"},
+    {"from": "fl", "to": "M", "label": "no"}
+  ]
+}

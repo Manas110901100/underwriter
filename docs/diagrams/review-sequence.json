@@ -1,0 +1,40 @@
+{
+  "kind": "sequence",
+  "title": "Review one submission (Streamlit)",
+  "subtitle": "app.py process() and show_review(), with a human override at the end",
+  "participants": [
+    {"id": "u", "label": "Underwriter", "kind": "client"},
+    {"id": "app", "label": "app.py", "kind": "ui"},
+    {"id": "pipe", "label": "pipeline.py", "kind": "gateway"},
+    {"id": "rd", "label": "readers\npdf / email / csv", "kind": "worker"},
+    {"id": "ai", "label": "OpenAI\nvia LangChain", "kind": "external"},
+    {"id": "rev", "label": "merge + rules", "kind": "service"},
+    {"id": "nar", "label": "narrative.py", "kind": "service"}
+  ],
+  "steps": [
+    {"from": "u", "to": "app", "label": "add files, click Review"},
+    {"from": "app", "to": "app", "label": "preflight, save to temp dir"},
+    {"from": "app", "to": "pipe", "label": "extract_all(paths)"},
+    {"from": "pipe", "to": "rd", "label": "gather: one task per file", "style": "async"},
+    {"note": "pdfplumber text + tables per page; CSV counted with no model call", "over": ["pipe", "rd"]},
+    {"from": "rd", "to": "ai", "label": "classify + extract"},
+    {"from": "ai", "to": "rd", "label": "values + quotes", "style": "return"},
+    {"from": "rd", "to": "rd", "label": "verify quote, fix page"},
+    {"from": "rd", "to": "pipe", "label": "SourceResult each", "style": "return"},
+    {"from": "pipe", "to": "app", "label": "sources", "style": "return"},
+    {"from": "app", "to": "rev", "label": "merge_sources"},
+    {"from": "rev", "to": "app", "label": "KNOWN / MISSING / CONFLICT / INVALID", "style": "return"},
+    {"from": "app", "to": "rev", "label": "evaluate_rules"},
+    {"from": "rev", "to": "app", "label": "R1-R5 PASS / FLAG / UNKNOWN", "style": "return"},
+    {"from": "app", "to": "nar", "label": "write_narrative"},
+    {"from": "nar", "to": "nar", "label": "request_items (no LLM)"},
+    {"from": "nar", "to": "ai", "label": "facts only"},
+    {"from": "ai", "to": "nar", "label": "summary + email", "style": "return"},
+    {"from": "nar", "to": "app", "label": "NarrativeResult", "style": "return"},
+    {"from": "app", "to": "u", "label": "status, fields, evidence, draft", "style": "return"},
+    {"divider": "reviewer corrects a field"},
+    {"from": "u", "to": "app", "label": "apply correction"},
+    {"from": "app", "to": "rev", "label": "apply_override + evaluate_rules"},
+    {"from": "app", "to": "u", "label": "updated checks, summary stale", "style": "return"}
+  ]
+}

@@ -1,0 +1,8 @@
+pdfplumber==0.11.10
+langchain-openai==1.1.6
+openai==2.8.1
+langchain-core==1.6.1
+pydantic==2.9.0
+python-dotenv==1.2.1
+pytest==9.1.1
+streamlit==1.62.0

@@ -1,0 +1,31 @@
+# Files that must never be committed.
+
+# --- Secrets ---------------------------------------------------------------
+# The real OpenAI key lives in .env (copy it from .env.example, which IS committed)
+.env
+.streamlit/secrets.toml
+
+# --- Python ----------------------------------------------------------------
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# --- Review output (contains applicant data) -------------------------------
+# Written by `python main.py ... --out <file>` (names used in README and main.py)
+results*.json
+review.json
+# Downloaded from the Streamlit app
+submission_review.json
+draft_broker_email.txt
+
+# --- Diagram build scratch -------------------------------------------------
+docs/diagrams/*.metrics.json
+
+# --- Editor and OS clutter -------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
