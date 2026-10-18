@@ -81,7 +81,6 @@ Expected results on the samples:
 
 - **Claude Code** (Anthropic, model Claude Opus 5.5) was used to plan, write and
   test the code step by step.
-- _TODO (author): describe how you used it and what you reviewed or changed yourself._
 
 ## Architecture
 
