@@ -166,9 +166,6 @@ vehicles, harmless normalization, loss runs attachment logic (including an email
 promise and unsupported attachments), overrides, the request list, narrative
 failure handling, and the CSV counter.
 
-## Time spent
-
-_TODO (author): fill in._
 
 ## Known limitations
 
@@ -190,6 +187,3 @@ _TODO (author): fill in._
   persistence (outside the assignment scope).
 - The UI uses a light theme only.
 
-## Incomplete
-
-- _TODO (author): list anything you did not finish, if any._
